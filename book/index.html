@@ -1,9 +1,9 @@
 <!DOCTYPE HTML>
-<html lang="en" class="light sidebar-visible" dir="ltr">
+<html lang="en" class="rust sidebar-visible" dir="ltr">
     <head>
         <!-- Book generated using mdBook -->
         <meta charset="UTF-8">
-        <title>Introduction</title>
+        <title>Table of Contents - Wallet Privacy Roadmap</title>
 
 
         <!-- Custom HTML head -->
@@ -34,8 +34,8 @@
         <!-- Provide site root and default themes to javascript -->
         <script>
             const path_to_root = "";
-            const default_light_theme = "light";
-            const default_dark_theme = "navy";
+            const default_light_theme = "rust";
+            const default_dark_theme = "ayu";
         </script>
         <!-- Start loading toc.js asap -->
         <script src="toc.js"></script>
@@ -76,7 +76,7 @@
             try { theme = localStorage.getItem('mdbook-theme'); } catch(e) { }
             if (theme === null || theme === undefined) { theme = default_theme; }
             const html = document.documentElement;
-            html.classList.remove('light')
+            html.classList.remove('rust')
             html.classList.add(theme);
             html.classList.add("js");
         </script>
@@ -134,7 +134,7 @@
                         </button>
                     </div>
 
-                    <h1 class="menu-title"></h1>
+                    <h1 class="menu-title">Wallet Privacy Roadmap</h1>
 
                     <div class="right-buttons">
                         <a href="print.html" title="Print this book" aria-label="Print this book">
@@ -166,14 +166,27 @@
 
                 <div id="content" class="content">
                     <main>
-                        <h1 id="intro"><a class="header" href="#intro">Intro</a></h1>
-<p>Hi</p>
+                        <h1 id="table-of-contents"><a class="header" href="#table-of-contents">Table of Contents</a></h1>
+<ul>
+<li>
+<p><a href="./diagram.html">Diagram</a> of onchain privacy problem and solution space. High Level.</p>
+</li>
+<li>
+<p><a href="./goals.html">Goals</a> for the medium term: what is the desired state for wallet privacy features? Just a sketch.</p>
+</li>
+<li>
+<p><a href="./phase1.html">Phase 1</a> plan for first bundle of privacy features to prepare and spec. More detailed.</p>
+</li>
+</ul>
 
                     </main>
 
                     <nav class="nav-wrapper" aria-label="Page navigation">
                         <!-- Mobile navigation buttons -->
 
+                            <a rel="next prefetch" href="diagram.html" class="mobile-nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                                <i class="fa fa-angle-right"></i>
+                            </a>
 
                         <div style="clear: both"></div>
                     </nav>
@@ -182,6 +195,9 @@
 
             <nav class="nav-wide-wrapper" aria-label="Page navigation">
 
+                    <a rel="next prefetch" href="diagram.html" class="nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                        <i class="fa fa-angle-right"></i>
+                    </a>
             </nav>
 
         </div>
