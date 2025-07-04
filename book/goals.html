@@ -167,6 +167,90 @@
                 <div id="content" class="content">
                     <main>
                         <h1 id="goals"><a class="header" href="#goals">Goals</a></h1>
+<p>This document outlines the medium-term goals for the Wallet SDK and Kohaku Wallet UX from the perspective of privacy. We want to make sure we are designing towards a strong/ideal privacy UX.</p>
+<p>The main goal for the SDK and example wallet implementation is to <strong>introduce a new chain-interop focused and privacy-first standard for Ethereum self-custody wallets of general use</strong>.</p>
+<p>Here we tackle what the privacy part could look like in practice. By attempting to define the ideal privacy UX first, we ensure that short-term milestones align with the medium/long-term vision.</p>
+<hr />
+<h2 id="0-root-identity-and-key-management"><a class="header" href="#0-root-identity-and-key-management">0. Root Identity and Key Management</a></h2>
+<h3 id="01-everything-derives-from-a-seed-phrase"><a class="header" href="#01-everything-derives-from-a-seed-phrase">0.1 Everything Derives From a Seed Phrase</a></h3>
+<p>The entire wallet is deterministically derived from a single seed phrase (BIP-32 compliant etc). From this seed, users generate <strong>User Accounts</strong> which are isolated identity/persona namespaces. But these identity/persona namespaces are multi-chain and multi-credential abstractions, not just a naive 1 keypair == 1 persona/identity.</p>
+<p>A multi-chain <strong>User Account</strong> derives these things (on each chain):</p>
+<ul>
+<li><strong>Canonical Public Address credential</strong> (<code>bob.eth@arb</code> resolves to bob's canonical public address on arbitrum which is controlled by this key)</li>
+<li><strong>Stealth Meta Address credential</strong> (<code>bob.eth@arb</code> has a mapping on arbitrum's canonical ERC-6538 registry contract set to a Stealth Meta Address, let's call it <code>st:bob.eth@arb</code>, which is controlled by these keys)</li>
+<li><strong>Mixer credentials</strong> (credentials for Railgun, Privacy Pools, and Tornado Cash. Each mixer protocol creds are derived from keys in the HD wallet tree in some canonized way. <em>NOTE: likely this will only matter for mainnet, as current thinking is that we push all mixer activity to mainnet to maximize anonymity set there?</em>)</li>
+<li><strong>Ephemeral Addresses credentials</strong> (for one-time DeFi interactions or payment links to give to third parties, a standard for how to derive these keypairs as needed)</li>
+</ul>
+<p>Each <strong>User Account</strong> is a scoped, chain-aware identity. User explicitly "initializes" different chains for the given account, which defines the domain of chains that the user willingly interacts across seamlessly.</p>
+<h3 id="02-ercification-wallets-eventually-interop-with-this-shared-standard"><a class="header" href="#02-ercification-wallets-eventually-interop-with-this-shared-standard">0.2 ERCification: Wallets eventually interop with this shared standard</a></h3>
+<p>Ideally this is an interoperable shared standard of how to interpret and recover credentials from the seed phrase. To me this could be enshrined in one or a set of ERCs. The goal is that you can take your seed phrase to another wallet client and "voila" you find all your assets even if scattered across a number of addresses and also has assets inside a particular Mixer application. Also, if all software goes boom and user really wants to "go it alone" they can read all the ERCs to technically have the information necessary to reconstruct everything.</p>
+<hr />
+<h2 id="1-write-ux-maximize-private-actions-by-default"><a class="header" href="#1-write-ux-maximize-private-actions-by-default">1. Write UX: Maximize Private Actions by Default</a></h2>
+<p>The goal is to make privacy something that happens mostly by default, without the user needing to restrict themselves from doing the things they normally want to do onchain. In rare cases that a user WANTS some activity or holdings to be linked to their identity publically, this is something that the user can seek out explicitly outside of the defaults. But in all other cases, the wallet would opt for unlinked and/or untraceable activity and holdings. Let's go into more detail.</p>
+<h3 id="11-proactive-mixing-of-fund-balances"><a class="header" href="#11-proactive-mixing-of-fund-balances">1.1 Proactive Mixing of Fund Balances</a></h3>
+<ul>
+<li>As many tokens as possible with large enough transfer activity should have accessible mixer pools (especially on mainnet).</li>
+<li>Any token with a positive balance in the user account with a mixer pool should (ideally) get mixed eventually.</li>
+<li>Wallets can auto-mix balances on behalf of user based on preferences (e.g. "always mix 50% of my ETH"). Users could also click "mix" next to balances of tokens on a case by case basis as another UX. But mixing a good portion of your assets should be highly encouraged by the standard wallet UX.</li>
+<li>Mixed funds become “pTokens” (e.g. pETH, pDAI) after a pending period</li>
+<li>SDK has abstract enough interfaces/patterns that the different mixer protocols are plug-and-play (Privacy Pools, Railgun, TC). We make sure all 3 protocols can support the main features we want (mix, reassign funds to a target receiver in the mixer - ok if involves a temporary hop out).</li>
+</ul>
+<h3 id="12-privacy-of-fund-transfers"><a class="header" href="#12-privacy-of-fund-transfers">1.2 Privacy of Fund Transfers</a></h3>
+<ul>
+<li><strong>Receiving</strong>: others sending to <code>bob.eth@chain</code> will use stealth addresses protocol automatically when <code>bob.eth@chain</code> has a record set on ERC-6538 registry. So even if sender doesn't ahve a "private balance" receiver address is still delinked. Bob can also create chain-specific payment links for reception from 3rd parties, and these links will always be to a fresh ephemeral address on the bob.eth User Account. When bob receives the funds to the User Account (either to an ephemeral or stealth address), bob does not need to be concerned with the technicality that it's in a fresh address. Bob only sees aggregated balances (see 1.7).</li>
+<li><strong>Sending</strong>: if private funds exist for sender (e.g. sending X ETH, sender has at least X pETH already), the wallet send will be made private by default. If user does not have sufficient private funds, the user will be alerted that the send is NOT private and that it can be made private (but involves delay period e.g. mixing more pETH). When sending from Mixed private funds to a new user, ideally the funds for the target receiver also end up back in the mixer pool (ok if involves a hop out but ideally this whole process is automatic receiver just notices received pETH)</li>
+<li>The goal is most direct transfers from wallets will have both sender and receiver privacy. If no sender privacy, we still fallback to just delinked receiver.</li>
+<li>Where and when possible receiver will <em>automatically</em> get their received funds back inside the mixer. So every mixer solution should have this feature that allows you to either reassign the funds to recipient directly in the mixer or else have a peripheral integration with the mixer so the funds go out but then automatically back in for the target receiver.</li>
+</ul>
+<h3 id="13-private-defi--dapp-interactions"><a class="header" href="#13-private-defi--dapp-interactions">1.3 Private DeFi / Dapp Interactions</a></h3>
+<ul>
+<li>When doing a DeFi or Dapp interaction that requires transferring assets, if those assets are fully covered from User Account private balances (supply liquidity to ETH/DAI on uniswap but holding pETH and pDAI), then the interaction is done privately by default. This means the funds come out of the mixer protocol into an ephemeral address, and the ephemeral address interacts with the Dapp.</li>
+<li>In general addresses should be 1-time-use as much as possible (or two-time for e.g. deposit, and later, withdraw). Much like bitcoin wallets everytime you touch an address (that isn't the Canonical Public Address) you should sweep all the funds and never reuse it again. E.g. you have 23 DAI in your address and want to swap 10 for ETH, the ETH output should go to a new fresh address and the 13 DAI change should also get transferred to a new fresh address.</li>
+<li>Pay gas fees for relayed operations either with some portion of the operation itself or with pETH wherever possible (see 1.5)</li>
+</ul>
+<h3 id="14-chain--and-address-agnostic-authorization"><a class="header" href="#14-chain--and-address-agnostic-authorization">1.4 Chain- and Address-Agnostic Authorization</a></h3>
+<ul>
+<li>Users approve actions in an intuitive way similar or even better than wallets of today (authorize the intended action/interaction just once, then it happens). No need to sign each ECDSA signature address-by-address individually as a UX.</li>
+<li>Wallet orchestrates eoa upgrades (EIP-7702), bridging, routing, relaying under the hood. User can get all the relevant information for their operations to be legible, but the "lazy" UX would be really simple and easy and low-click-count.</li>
+</ul>
+<h3 id="15-privacy-aware-relayers-and-paymasters"><a class="header" href="#15-privacy-aware-relayers-and-paymasters">1.5 Privacy-Aware Relayers and Paymasters</a></h3>
+<ul>
+<li>Relayers/paymasters should be paid in a privacy-preserving way (e.g. with pETH) where possible.</li>
+<li>Ideally / eventually would be ideal if relayers/paymasters could merge user opertaions being paid out of a mixer into one aggregated SNARK so that onchain we can't even tell how the repayments for the user op in this bundle maps to different entities / groupings.</li>
+<li>Should be compatible with open standards like ERC-4337 rather than enshrining some custom relayer layer.</li>
+</ul>
+<h3 id="16-privacy-legibility"><a class="header" href="#16-privacy-legibility">1.6 Privacy Legibility</a></h3>
+<p>Users need to understand what is private and what is not in their wallet and this is a non-trivial UX problem to solve as it can easily become subtle and complex. To keep it simple we propose an "all or nothing" privacy legibility strategy:</p>
+<ul>
+<li><strong>Mixed assets</strong> (e.g. pETH, pDAI) are explicitly marked as “Private”</li>
+<li><strong>Unlinked balances</strong> (via stealth or ephemeral addresses) are treated as “normal” — not labeled private explicitly. We call anything in a mixer or having come directly out of a mixer into a fresh address a "private" holding/position. But every other holding is "not necessarily private" even if funds are received to random fresh address. If the funds didn't come directly from a mixer or are not sitting in a mixer, it's not considered private funds.</li>
+</ul>
+<h3 id="17-unified-privacy-aware-balances"><a class="header" href="#17-unified-privacy-aware-balances">1.7 Unified, Privacy-Aware Balances</a></h3>
+<p>User balances are presented in a unified interface:</p>
+<ul>
+<li>DAI across chains and stealth/ephemeral addresses is shown as a single DAI balance</li>
+<li>However private (mixed) assets are shown separately: e.g. <code>pDAI</code></li>
+<li>Users don’t <em>need</em> to track exact address or chain info of where funds are stored unless they want to</li>
+</ul>
+<hr />
+<h2 id="2-read-ux-private-chain-access"><a class="header" href="#2-read-ux-private-chain-access">2. Read UX: Private Chain Access</a></h2>
+<h3 id="21-private-reads-from-the-chain"><a class="header" href="#21-private-reads-from-the-chain">2.1 Private Reads from the Chain</a></h3>
+<p>Wallets avoid leaking interest in specific addresses, contracts, or storage</p>
+<ul>
+<li>Short term: TEE + ORAM-powered RPCs</li>
+<li>Long term: PIR-based decentralized state queries or on-device light clients</li>
+</ul>
+<h3 id="22-minimize-centralized-apis"><a class="header" href="#22-minimize-centralized-apis">2.2 Minimize Centralized APIs</a></h3>
+<p>This seems easy in theory (don't call third party apis) but in practice there's a lot to think about. How about getting things like asset prices and logos and little UX details that make the user's life easy ?</p>
+<hr />
+<h2 id="3-propagation-ux-private-broadcasting-of-transactions"><a class="header" href="#3-propagation-ux-private-broadcasting-of-transactions">3. Propagation UX: Private Broadcasting of Transactions</a></h2>
+<h3 id="31-private-transaction-propagation"><a class="header" href="#31-private-transaction-propagation">3.1 Private Transaction Propagation</a></h3>
+<p>Transactions or intents should be broadcast without revealing user IP or geographic metadata</p>
+<ul>
+<li>L1-native propagation privacy is preferred (if/when available)</li>
+<li>Interim options exist in out-of-protocol tools like Waku, Nym, Dandelion++, HOPR / Gnosis VPN.</li>
+</ul>
+<hr />
 
                     </main>
 

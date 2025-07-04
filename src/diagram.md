@@ -10,4 +10,4 @@ We split the onchain privacy problem space into three basic categories:
 
 *key: blue=problems, orange=solutions, red=L1 delivered solutions*
 
-to see diagram higher res and interactive, [click here](https://excalidraw.com/#json=aoLPXZTaoZxiKPuFXO9gx,1CWOb7N2pFueCwwkRNZcJQ)
+for HIGHER RESOLUTION diagram [click here](https://excalidraw.com/#json=aoLPXZTaoZxiKPuFXO9gx,1CWOb7N2pFueCwwkRNZcJQ)
