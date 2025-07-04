@@ -82,12 +82,14 @@ To reduce complexity, apply an “all-or-nothing” visibility strategy:
 
 - **Mixed assets** (pETH, pDAI) are clearly marked as “Private”.
 - **Unlinked assets** (stealth/ephemeral) are not marked as private.
-  - Only funds inside or directly out of a mixer are considered private.
+  - Only funds inside or directly one-hop out of a mixer are considered private.
+
+(_NOTE: with "just out of the mixer" assets I bleieve those can also be labeled pDAI. Once there is more activity than just one hop from the mixer it's no longer private anymore. But the first hop out of the mixer is still a private balance maybe? This is a concept worth continuing to discuss_)
 
 ### 1.7 Unified, Privacy-Aware Balances
 
 - All chain/ephemeral/stealth balances of a token are shown as a single number.
-- Mixed assets are displayed and counted separately (e.g., `DAI`, `pDAI`) (_NOTE: with "just out of the mixer" assets I bleieve those can also be labeled pDAI. Once there is more activity than just one hop from the mixer it's no longer private anymore. But the first hop out of the mixer is still a private balance maybe? This is a concept worth continuing to discuss_)
+- Mixed assets are displayed and counted separately (e.g., `DAI`, `pDAI`)
 - Users can inspect exact address/chain info, but aren’t required to.
 
 ---
