@@ -58,8 +58,10 @@ Privacy should be the default. Public linkability to Canonical Public Address(es
 ### 1.3 Private DeFi / Dapp Interactions
 
 - If private balances cover the action, wallet moves assets from mixer to a fresh ephemeral address to interact with the Dapp. This is our way of doing "generic private defi interactions"
+- As a tactic we don't focus on mixer integrations with specific DeFi protocols but with generic solutions (like the above use of ephemeral addresses) to support dapp interactions generically
 - Ideally, all addresses (except canonical public) are one-time-use (or two-time-use if deposit, wait, withdraw)
-  - Example: swap 10 of 23 DAI in an address for ETH. Output ETH goes to fresh address; change (13 DAI) goes to another fresh address. The original address holding 23 DAI was one-time-use and can now be discarded.
+  - Example 1: swap 10 of 23 DAI in an address for ETH. Output ETH goes to fresh address; change (13 DAI) goes to another fresh address. The original address holding 23 DAI was one-time-use and can now be discarded.
+  - Example 2: 10 pDAI and 1 pETH come out of the mixer into ephemeral address 0xabc...123 then 0xabc...123 supplies liquidity to uniswap. Now the user has this LP position. A few weeks later user removes liquidity and funds get pulled out of uniswap into 0xabc...123 and immediately get forwarded somewhere else (each balance separated in a different address perhaps)
 - Gas for relayed ops should be paid with pETH or in-operation value.
 
 ### 1.4 Chain- and Address-Agnostic Authorization
@@ -85,7 +87,7 @@ To reduce complexity, apply an “all-or-nothing” visibility strategy:
 ### 1.7 Unified, Privacy-Aware Balances
 
 - All chain/ephemeral/stealth balances of a token are shown as a single number.
-- Mixed assets are displayed separately (e.g., `DAI`, `pDAI`).
+- Mixed assets are displayed and counted separately (e.g., `DAI`, `pDAI`) (_NOTE: with "just out of the mixer" assets I bleieve those can also be labeled pDAI. Once there is more activity than just one hop from the mixer it's no longer private anymore. But the first hop out of the mixer is still a private balance maybe? This is a concept worth continuing to discuss_)
 - Users can inspect exact address/chain info, but aren’t required to.
 
 ---
