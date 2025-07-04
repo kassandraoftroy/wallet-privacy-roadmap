@@ -1,8 +1,6 @@
 # wallet-privacy-roadmap
 
-Info on roadmap to add privacy features to new SDK for contemporary ethereum wallets
-
-Inspired by the Rust Book.
+Wallet Privacy features roadmap booklet (intended for the creators of a new SDK for more contemporary ethereum wallets)
 
 ## Setup
 
