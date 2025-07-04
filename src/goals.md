@@ -94,14 +94,14 @@ To reduce complexity, apply an “all-or-nothing” visibility strategy:
 
 ### 2.1 Private Reads from the Chain
 
-Wallets should avoid leaking interest in addresses or contracts.
+Wallets should avoid leaking interest in addresses or contracts (onchain data more generally)
 
 - Short-term: use TEE + ORAM RPC technique.
-- Long-term: support PIR or make on-device light clients and partial state nodes a reality.
+- Long-term: support PIR RPC or make on-device light clients and partial state nodes a reality.
 
 ### 2.2 Minimize Centralized APIs
 
-Third-party APIs should be avoided or minimized. May sound easy in theory but in practice there are a lot of little conveniences (like token prices and logs etc.) that usually rely on third party APIs that need to be thought through.
+Third-party APIs should be MAXIMALLY avoided, we should be as stringent as possible here. May sound easy in theory but in practice there are a lot of little conveniences (like token prices and logs etc.) that usually rely on third party APIs that need to be thought through.
 
 ---
 
